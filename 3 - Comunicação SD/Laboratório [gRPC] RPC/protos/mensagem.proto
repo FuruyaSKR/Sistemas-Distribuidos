@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package pedido;
+
+service SistemaPedidos {
+  rpc EnviarPedido (Pedido) returns (Confirmacao);
+  rpc ReceberPedido (Solicitacao) returns (Pedido);
+}
+
+message Pedido {
+  string descricao = 1;
+}
+
+message Confirmacao {
+  string status = 1;
+}
+
+message Solicitacao {}
