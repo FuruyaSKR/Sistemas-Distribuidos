@@ -1,0 +1,111 @@
+version: "3.8"
+
+services:
+  mongo1:
+    image: mongo:6
+    command:
+      - --replSet
+      - rs0
+    volumes:
+      - mongo1_data:/data/db
+    ports:
+      - "27017:27017"
+    healthcheck:
+      test:
+        - CMD
+        - mongo
+        - --eval
+        - "db.adminCommand('ping')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo2:
+    image: mongo:6
+    command:
+      - --replSet
+      - rs0
+    volumes:
+      - mongo2_data:/data/db
+    ports:
+      - "27018:27017"
+    healthcheck:
+      test:
+        - CMD
+        - mongo
+        - --host
+        - mongo2
+        - --eval
+        - "db.adminCommand('ping')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  mongo3:
+    image: mongo:6
+    command:
+      - --replSet
+      - rs0
+    volumes:
+      - mongo3_data:/data/db
+    ports:
+      - "27019:27017"
+    healthcheck:
+      test:
+        - CMD
+        - mongo
+        - --host
+        - mongo3
+        - --eval
+        - "db.adminCommand('ping')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  init-replica:
+    image: mongo:6
+    depends_on:
+      - mongo1
+      - mongo2
+      - mongo3
+    entrypoint: >
+      bash -c "
+        sleep 5 &&
+        mongosh --host mongo1:27017 --eval \\
+          \"rs.initiate({
+             _id: 'rs0',
+             members: [
+               {_id: 0, host: 'mongo1:27017'},
+               {_id: 1, host: 'mongo2:27017'},
+               {_id: 2, host: 'mongo3:27017'}
+             ]
+           })\"
+      "
+    restart: "no"
+
+  ethereum:
+    build:
+      context: ./smart-contract
+      dockerfile: Dockerfile
+    ports:
+      - "8545:8545"
+    networks:
+      - project-network
+
+  api:
+    build:
+      context: ./api
+      dockerfile: Dockerfile
+    env_file:
+      - .env
+    ports:
+      - "50051:50051"
+    depends_on:
+      - ethereum
+    networks:
+      - project-network
+
+volumes:
+  mongo1_data:
+  mongo2_data:
+  mongo3_data:

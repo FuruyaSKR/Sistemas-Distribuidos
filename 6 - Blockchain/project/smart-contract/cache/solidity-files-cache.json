@@ -1,0 +1,40 @@
+{
+  "_format": "hh-sol-cache-2",
+  "files": {
+    "C:\\Users\\Furuya\\Documents\\Codes\\Sistemas Distribuidos\\6 - Blockchain\\project\\smart-contract\\contracts\\Vaccine.sol": {
+      "lastModificationDate": 1749611637955,
+      "contentHash": "e7fe38a20147a70e1ae4851a30a9dc89",
+      "sourceName": "contracts/Vaccine.sol",
+      "solcConfig": {
+        "version": "0.8.17",
+        "settings": {
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.17"
+      ],
+      "artifacts": [
+        "Vaccines"
+      ]
+    }
+  }
+}

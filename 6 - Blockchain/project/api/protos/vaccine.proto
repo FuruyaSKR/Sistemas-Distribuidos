@@ -1,0 +1,15 @@
+syntax = "proto3";
+package vaccine;
+service VaccineService {
+  rpc RegisterVaccine(RegisterRequest) returns (RegisterReply);
+}
+message RegisterRequest {
+  string name = 1;
+  string cpf  = 2;
+  string vType = 3;
+  string date = 4;  // ISO8601
+}
+message RegisterReply {
+  bool success = 1;
+  string txHash = 2;
+}
