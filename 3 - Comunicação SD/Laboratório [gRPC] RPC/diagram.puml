@@ -1,0 +1,59 @@
+@startuml RPC
+
+left to right direction
+skinparam packageStyle rectangle
+skinparam linetype ortho
+
+package "Protos e Mensagens" {
+  interface GerenciadorPedidos {
+    +RegistrarPedido(Pedido) : Confirmacao
+    +ObterProximoPedido(Solicitacao) : Pedido
+  }
+  class Pedido {
+    +descricao: str
+  }
+  class Confirmacao {
+    +status: str
+  }
+  class Solicitacao {
+  }
+}
+
+package "Generated" {
+  class GerenciadorPedidosStub {
+    +RegistrarPedido(Pedido) : Confirmacao
+    +ObterProximoPedido(Solicitacao) : Pedido
+  }
+}
+
+package "Server" {
+  class GerenciadorPedidosServicerImpl {
+    +RegistrarPedido(request: Pedido, context) : Confirmacao
+    +ObterProximoPedido(request: Solicitacao, context) : Pedido
+  }
+}
+
+package "Clientes" {
+  class Produtor {
+    +run() : void
+  }
+  class Consumidor {
+    +run() : void
+  }
+}
+
+GerenciadorPedidosServicerImpl ..|> GerenciadorPedidos
+GerenciadorPedidosStub ..|> GerenciadorPedidos
+
+Produtor ..> GerenciadorPedidosStub : usa
+Consumidor ..> GerenciadorPedidosStub : usa
+
+GerenciadorPedidosServicerImpl --> Pedido
+GerenciadorPedidosServicerImpl --> Confirmacao
+
+GerenciadorPedidosStub --> Pedido
+GerenciadorPedidosStub --> Confirmacao
+
+Produtor --> Pedido
+Consumidor --> Pedido
+@enduml

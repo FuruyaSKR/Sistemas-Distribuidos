@@ -3,7 +3,7 @@
 import grpc
 import warnings
 
-import mensagem_pb2 as mensagem__pb2
+import pedido_pb2 as pedido__pb2
 
 GRPC_GENERATED_VERSION = '1.71.0'
 GRPC_VERSION = grpc.__version__
@@ -18,14 +18,14 @@ except ImportError:
 if _version_not_supported:
     raise RuntimeError(
         f'The grpc package installed is at version {GRPC_VERSION},'
-        + f' but the generated code in mensagem_pb2_grpc.py depends on'
+        + f' but the generated code in pedido_pb2_grpc.py depends on'
         + f' grpcio>={GRPC_GENERATED_VERSION}.'
         + f' Please upgrade your grpc module to grpcio>={GRPC_GENERATED_VERSION}'
         + f' or downgrade your generated code using grpcio-tools<={GRPC_VERSION}.'
     )
 
 
-class SistemaPedidosStub(object):
+class GerenciadorPedidosStub(object):
     """Missing associated documentation comment in .proto file."""
 
     def __init__(self, channel):
@@ -34,59 +34,59 @@ class SistemaPedidosStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.EnviarPedido = channel.unary_unary(
-                '/pedido.SistemaPedidos/EnviarPedido',
-                request_serializer=mensagem__pb2.Pedido.SerializeToString,
-                response_deserializer=mensagem__pb2.Confirmacao.FromString,
+        self.RegistrarPedido = channel.unary_unary(
+                '/pedido.GerenciadorPedidos/RegistrarPedido',
+                request_serializer=pedido__pb2.Pedido.SerializeToString,
+                response_deserializer=pedido__pb2.Confirmacao.FromString,
                 _registered_method=True)
-        self.ReceberPedido = channel.unary_unary(
-                '/pedido.SistemaPedidos/ReceberPedido',
-                request_serializer=mensagem__pb2.Solicitacao.SerializeToString,
-                response_deserializer=mensagem__pb2.Pedido.FromString,
+        self.ObterProximoPedido = channel.unary_unary(
+                '/pedido.GerenciadorPedidos/ObterProximoPedido',
+                request_serializer=pedido__pb2.Solicitacao.SerializeToString,
+                response_deserializer=pedido__pb2.Pedido.FromString,
                 _registered_method=True)
 
 
-class SistemaPedidosServicer(object):
+class GerenciadorPedidosServicer(object):
     """Missing associated documentation comment in .proto file."""
 
-    def EnviarPedido(self, request, context):
+    def RegistrarPedido(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
-    def ReceberPedido(self, request, context):
+    def ObterProximoPedido(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
         raise NotImplementedError('Method not implemented!')
 
 
-def add_SistemaPedidosServicer_to_server(servicer, server):
+def add_GerenciadorPedidosServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'EnviarPedido': grpc.unary_unary_rpc_method_handler(
-                    servicer.EnviarPedido,
-                    request_deserializer=mensagem__pb2.Pedido.FromString,
-                    response_serializer=mensagem__pb2.Confirmacao.SerializeToString,
+            'RegistrarPedido': grpc.unary_unary_rpc_method_handler(
+                    servicer.RegistrarPedido,
+                    request_deserializer=pedido__pb2.Pedido.FromString,
+                    response_serializer=pedido__pb2.Confirmacao.SerializeToString,
             ),
-            'ReceberPedido': grpc.unary_unary_rpc_method_handler(
-                    servicer.ReceberPedido,
-                    request_deserializer=mensagem__pb2.Solicitacao.FromString,
-                    response_serializer=mensagem__pb2.Pedido.SerializeToString,
+            'ObterProximoPedido': grpc.unary_unary_rpc_method_handler(
+                    servicer.ObterProximoPedido,
+                    request_deserializer=pedido__pb2.Solicitacao.FromString,
+                    response_serializer=pedido__pb2.Pedido.SerializeToString,
             ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
-            'pedido.SistemaPedidos', rpc_method_handlers)
+            'pedido.GerenciadorPedidos', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
-    server.add_registered_method_handlers('pedido.SistemaPedidos', rpc_method_handlers)
+    server.add_registered_method_handlers('pedido.GerenciadorPedidos', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
-class SistemaPedidos(object):
+class GerenciadorPedidos(object):
     """Missing associated documentation comment in .proto file."""
 
     @staticmethod
-    def EnviarPedido(request,
+    def RegistrarPedido(request,
             target,
             options=(),
             channel_credentials=None,
@@ -99,9 +99,9 @@ class SistemaPedidos(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/pedido.SistemaPedidos/EnviarPedido',
-            mensagem__pb2.Pedido.SerializeToString,
-            mensagem__pb2.Confirmacao.FromString,
+            '/pedido.GerenciadorPedidos/RegistrarPedido',
+            pedido__pb2.Pedido.SerializeToString,
+            pedido__pb2.Confirmacao.FromString,
             options,
             channel_credentials,
             insecure,
@@ -113,7 +113,7 @@ class SistemaPedidos(object):
             _registered_method=True)
 
     @staticmethod
-    def ReceberPedido(request,
+    def ObterProximoPedido(request,
             target,
             options=(),
             channel_credentials=None,
@@ -126,9 +126,9 @@ class SistemaPedidos(object):
         return grpc.experimental.unary_unary(
             request,
             target,
-            '/pedido.SistemaPedidos/ReceberPedido',
-            mensagem__pb2.Solicitacao.SerializeToString,
-            mensagem__pb2.Pedido.FromString,
+            '/pedido.GerenciadorPedidos/ObterProximoPedido',
+            pedido__pb2.Solicitacao.SerializeToString,
+            pedido__pb2.Pedido.FromString,
             options,
             channel_credentials,
             insecure,

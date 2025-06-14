@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package pedido;
 
-service SistemaPedidos {
-  rpc EnviarPedido (Pedido) returns (Confirmacao);
-  rpc ReceberPedido (Solicitacao) returns (Pedido);
+service GerenciadorPedidos {
+  rpc RegistrarPedido (Pedido) returns (Confirmacao);
+  rpc ObterProximoPedido (Solicitacao) returns (Pedido);
 }
 
 message Pedido {
