@@ -5,7 +5,7 @@ require("dotenv").config();
 const grpc = require("@grpc/grpc-js");
 const protoLoader = require("@grpc/proto-loader");
 const mongoose = require("mongoose");
-const { JsonRpcProvider, Contract } = require("ethers");
+const { JsonRpcProvider, Wallet, Contract } = require("ethers");
 
 // 2. Conexão com MongoDB replicado
 //    - URI no formato replicaSet
@@ -44,12 +44,14 @@ const vaccineProto = grpc.loadPackageDefinition(packageDef).vaccine;
 
 // 5. Conexão com Ethereum local (Hardhat) e instância do contrato
 const artifact = require("./contractABI.json");
-const contractABI = artifact.abi;
 const provider = new JsonRpcProvider(process.env.ETH_RPC);
+const signer = new Wallet(process.env.HARDHAT_PRIVATE_KEY, provider);
+
+const contractABI = artifact.abi;
 const contract = new Contract(
   process.env.CONTRACT_ADDRESS,
   contractABI,
-  provider.getSigner()
+  signer
 );
 
 // 6. Implementação do método gRPC RegisterVaccine
@@ -58,24 +60,42 @@ async function registerVaccine(call, callback) {
   try {
     // 6.1 Envia transação para o contrato
     const tx = await contract.register(name, cpf, vType, Date.parse(date));
-    const receipt = await tx.wait(); // espera confirmação
+    const receipt = await tx.wait();
 
-    // 6.2 Persiste no Mongo com o hash da transação
-    const record = await VaccineModel.create({
+    await VaccineModel.create({
       name,
       cpf,
       vType,
       date: new Date(date),
-      txHash: receipt.transactionHash,
+      txHash: receipt.hash,
     });
 
-    // 6.3 Retorna sucesso ao cliente gRPC
     callback(null, {
       success: true,
-      txHash: receipt.transactionHash,
+      txHash: receipt.hash,
     });
   } catch (err) {
     console.error("Erro em registerVaccine:", err);
+    callback({
+      code: grpc.status.INTERNAL,
+      message: err.message,
+    });
+  }
+}
+
+async function listVaccines(call, callback) {
+  try {
+    const vaccines = await VaccineModel.find().sort({ date: -1 }).lean();
+    const result = vaccines.map((vac) => ({
+      name: vac.name,
+      cpf: vac.cpf,
+      vType: vac.vType,
+      date: vac.date.toISOString(),
+      txHash: vac.txHash,
+    }));
+    callback(null, { vaccines: result });
+  } catch (err) {
+    console.error("Erro em listVaccines:", err);
     callback({
       code: grpc.status.INTERNAL,
       message: err.message,
@@ -88,6 +108,7 @@ function main() {
   const server = new grpc.Server();
   server.addService(vaccineProto.VaccineService.service, {
     RegisterVaccine: registerVaccine,
+    ListVaccines: listVaccines,
   });
   const bindAddress = "0.0.0.0:50051";
   server.bindAsync(

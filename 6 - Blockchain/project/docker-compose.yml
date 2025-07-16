@@ -1,66 +1,64 @@
-version: "3.8"
-
 services:
   mongo1:
     image: mongo:6
-    command:
-      - --replSet
-      - rs0
+    command: [--replSet, rs0]
     volumes:
       - mongo1_data:/data/db
     ports:
       - "27017:27017"
     healthcheck:
-      test:
-        - CMD
-        - mongo
-        - --eval
-        - "db.adminCommand('ping')"
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - project-network
 
   mongo2:
     image: mongo:6
-    command:
-      - --replSet
-      - rs0
+    command: [--replSet, rs0]
     volumes:
       - mongo2_data:/data/db
     ports:
       - "27018:27017"
     healthcheck:
       test:
-        - CMD
-        - mongo
-        - --host
-        - mongo2
-        - --eval
-        - "db.adminCommand('ping')"
+        [
+          "CMD",
+          "mongo",
+          "--host",
+          "mongo2",
+          "--eval",
+          "db.adminCommand('ping')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - project-network
 
   mongo3:
     image: mongo:6
-    command:
-      - --replSet
-      - rs0
+    command: [--replSet, rs0]
     volumes:
       - mongo3_data:/data/db
     ports:
       - "27019:27017"
     healthcheck:
       test:
-        - CMD
-        - mongo
-        - --host
-        - mongo3
-        - --eval
-        - "db.adminCommand('ping')"
+        [
+          "CMD",
+          "mongo",
+          "--host",
+          "mongo3",
+          "--eval",
+          "db.adminCommand('ping')",
+        ]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - project-network
 
   init-replica:
     image: mongo:6
@@ -82,6 +80,8 @@ services:
            })\"
       "
     restart: "no"
+    networks:
+      - project-network
 
   ethereum:
     build:
@@ -104,8 +104,12 @@ services:
       - ethereum
     networks:
       - project-network
-
+    restart: always
 volumes:
   mongo1_data:
   mongo2_data:
   mongo3_data:
+
+networks:
+  project-network:
+    driver: bridge

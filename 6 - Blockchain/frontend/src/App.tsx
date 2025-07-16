@@ -1,13 +1,27 @@
-import React from "react";
-import VacinaForm from "./components/VacinaForm";
+import { useState } from "react";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Dashboard from "./pages/Dashboard";
 
-function App() {
-  return (
-    <div>
-      <h1>Cadastro de Vacina</h1>
-      <VacinaForm />
-    </div>
-  );
+function Routes() {
+  const { user } = useAuth();
+  const [page, setPage] = useState<"login" | "register">("login");
+
+  if (!user) {
+    return page === "login" ? (
+      <Login onRegister={() => setPage("register")} />
+    ) : (
+      <Register onLogin={() => setPage("login")} />
+    );
+  }
+  return <Dashboard />;
 }
 
-export default App;
+export default function App() {
+  return (
+    <AuthProvider>
+      <Routes />
+    </AuthProvider>
+  );
+}
